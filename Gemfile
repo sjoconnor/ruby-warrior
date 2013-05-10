@@ -1,4 +1,7 @@
-source :rubygems
+source 'https://rubygems.org'
+
+gem 'rubywarrior'
+gem 'pry'
 
 group :test do
   gem 'rake'
