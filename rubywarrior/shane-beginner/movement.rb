@@ -1,7 +1,7 @@
 module Movement
   def set_direction!
     direction = @available_directions.detect do |direction|
-      units = visible_units(direction)
+      units = visible_occupied_cells(direction)
 
       units.first.to_s == "Captive" || ranged_hostiles.include?(units.first.to_s)
     end

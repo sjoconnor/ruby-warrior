@@ -2,15 +2,19 @@ require 'pry'
 require 'status'
 require 'movement'
 require 'actions'
+require 'environment'
 
 class Player
   include Status
   include Movement
   include Actions
+  include Environment
 
   ACTION_SEQUENCE = [:retreat?, :ran_into_wall?,
                      :heal_to_full?, :found_captive?,
-                     :shoot_arrow?, :attack?, :walk?]
+                     :shoot_arrow?, :basic_attack?, :walk?]
+
+  attr_accessor :performing_retreat
 
   def initialize
     @max_health           = 20
@@ -31,18 +35,12 @@ class Player
   def take_action!
     ACTION_SEQUENCE.each do |action|
       if self.send(action)
-        self.send("handle_" + action.to_s.gsub(/\?/, '') + "!")
+        handle_action = "handle_" + action.to_s.gsub(/\?/, '') + "!"
+
+        self.send(handle_action.to_sym)
         return
       end
     end
-  end
-
-  def next_cell
-    @warrior.feel(@direction)
-  end
-
-  def visible_units(direction = @direction)
-    @warrior.look(direction).reject {|cell| cell.to_s == "nothing" }
   end
 
   def hostiles

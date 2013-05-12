@@ -15,7 +15,7 @@ module Status
     @warrior.health < @health_last_turn
   end
 
-  def heal_to_full?
-    safe? && (low_health? || @warrior.health < @max_health)
+  def full_health?
+    @warrior.health == @max_health
   end
 end
