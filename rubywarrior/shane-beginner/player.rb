@@ -1,98 +1,52 @@
 require 'pry'
 require 'status'
+require 'movement'
+require 'actions'
 
 class Player
   include Status
+  include Movement
+  include Actions
 
-  attr_accessor :warrior
-
-  DIRECTIONS = [:forward, :backward]
+  ACTION_SEQUENCE = [:retreat?, :ran_into_wall?,
+                     :heal_to_full?, :found_captive?,
+                     :shoot_arrow?, :attack?, :walk?]
 
   def initialize
-    @max_health       = 20
-    @health_last_turn = 20
-    @direction        = :forward
+    @max_health           = 20
+    @health_last_turn     = 20
+    @direction            = :forward
+    @available_directions = [:forward, :backward]
   end
 
   def play_turn(warrior)
     @warrior = warrior
 
-    take_action
+    set_direction!
+    take_action!
 
     @health_last_turn = warrior.health
   end
 
-  def take_action
-    set_direction
-
-    if retreat?
-      @direction = :forward ? :backward : :forward
-      warrior.walk!(@direction)
-      return
+  def take_action!
+    ACTION_SEQUENCE.each do |action|
+      if self.send(action)
+        self.send("handle_" + action.to_s.gsub(/\?/, '') + "!")
+        return
+      end
     end
-
-    if ran_into_wall?
-      @direction = :forward ? :backward : :forward
-      warrior.pivot!(@direction)
-      return
-    end
-
-    if safe_to_heal_up?
-      warrior.rest!
-      return
-    end
-
-    if found_captive?
-      warrior.rescue!(@direction)
-      return
-    end
-
-    if shoot_arrow?
-      warrior.shoot!(@direction)
-      return
-    end
-
-    warrior.walk!(@direction) if next_cell.empty?
-
-    warrior.attack!(@direction) unless next_cell.empty?
-  end
-
-  def set_direction
-    direction = DIRECTIONS.detect do |direction|
-      cells = warrior.look(direction)
-      units = cells.reject {|cell| cell.to_s == 'nothing'}
-
-      units.first.to_s == "Captive" || ranged_hostiles.include?(units.first.to_s)
-    end
-    @direction = direction || :forward
-  end
-
-  def shoot_arrow?
-    look = warrior.look(@direction).reject {|cell| cell.to_s == "nothing"}
-
-    return false if look.empty?
-    return false unless look.detect {|cell| hostiles.include?(cell.to_s)}
-    look.first.to_s != "Captive"
   end
 
   def next_cell
-    warrior.feel(@direction)
+    @warrior.feel(@direction)
   end
 
-  def retreat?
-    warrior.health < 6 && ! safe? && alone?
-  end
-
-  def ran_into_wall?
-    next_cell.wall?
-  end
-
-  def found_captive?
-    next_cell.captive?
+  def visible_units(direction = @direction)
+    @warrior.look(direction).reject {|cell| cell.to_s == "nothing" }
   end
 
   def hostiles
-    ["Wizard", "Archer", "Thick Sludge"]
+    ["Wizard", "Archer", "Thick Sludge", "Sludge", "Golem"]
   end
 
   def ranged_hostiles
