@@ -10,10 +10,6 @@ class Player
   include Actions
   include Environment
 
-  ACTION_SEQUENCE = [:retreat?, :ran_into_wall?,
-                     :heal_to_full?, :found_captive?,
-                     :shoot_arrow?, :basic_attack?, :walk?]
-
   attr_accessor :performing_retreat
 
   def initialize
@@ -21,6 +17,9 @@ class Player
     @health_last_turn     = 20
     @direction            = :forward
     @available_directions = [:forward, :backward]
+    @action_sequence      = [:retreat?, :ran_into_wall?,
+                             :heal_to_full?, :found_captive?,
+                             :shoot_arrow?, :basic_attack?, :walk?]
   end
 
   def play_turn(warrior)
@@ -33,7 +32,7 @@ class Player
   end
 
   def take_action!
-    ACTION_SEQUENCE.each do |action|
+    @action_sequence.each do |action|
       if self.send(action)
         handle_action = "handle_" + action.to_s.gsub(/\?/, '') + "!"
 
