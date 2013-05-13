@@ -17,7 +17,7 @@ class Player
     @health_last_turn     = 20
     @direction            = :forward
     @available_directions = [:forward, :backward, :left, :right]
-    @action_sequence      = [:retreat?, :bind?, :basic_attack?, :walk?]
+    @action_sequence      = [:heal_to_full?, :retreat?, :found_captive?, :bind?, :basic_attack?, :walk?]
   end
 
   def play_turn(warrior)
@@ -46,5 +46,9 @@ class Player
 
   def ranged_hostiles
     ["Wizard", "Archer"]
+  end
+
+  def performing_retreat
+    @performing_retreat ||= false
   end
 end

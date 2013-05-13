@@ -1,5 +1,10 @@
 module Movement
   def set_direction!
+    if @performing_retreat
+      @direction = nearest_empty_cell
+      return
+    end
+
     @direction = @warrior.direction_of_stairs
 
     # direction = @available_directions.detect do |direction|
@@ -11,6 +16,11 @@ module Movement
   end
 
   def change_direction!
+    if @performing_retreat
+      @direction = nearest_empty_cell
+      return
+    end
+
     if @direction == :forward
       @direction = :backward
     else

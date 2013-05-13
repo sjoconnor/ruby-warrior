@@ -12,7 +12,7 @@ module Environment
   end
 
   def visible_hostiles(direction = @direction)
-    @warrior.look(direction).select {|cell| hostiles.include?(cell.to_s)}
+    @warrior.feel(direction).select {|cell| hostiles.include?(cell.to_s)}
   end
 
   def visible_ranged_units?(direction = @direction)
@@ -30,6 +30,18 @@ module Environment
   def direction_of_nearest_enemy
     @available_directions.detect do |direction|
       next_cell(direction).enemy?
+    end
+  end
+
+  def direction_of_nearest_captive
+    @available_directions.detect do |direction|
+      next_cell(direction).captive?
+    end
+  end
+
+  def nearest_empty_cell
+    @available_directions.detect do |direction|
+      next_cell(direction).empty?
     end
   end
 end

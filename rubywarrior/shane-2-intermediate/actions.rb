@@ -6,14 +6,15 @@ module Actions
   def handle_retreat!
     puts "Retreating"
 
-    performing_retreat = full_health? ? false : true
+    @performing_retreat = true
 
-    change_direction! if performing_retreat
+    puts "Performin: #{performing_retreat}"
+    change_direction!
     @warrior.walk!(@direction)
   end
 
   def bind?
-    total_surrounding_enemies > 2
+    total_surrounding_enemies > 1
   end
 
   def handle_bind!
@@ -30,12 +31,13 @@ module Actions
   end
 
   def heal_to_full?
-    return false if visible_hostiles.empty?
+    # return false if visible_hostiles.empty?
     safe? && (low_health? || @warrior.health < @max_health) && ! taking_damage?
   end
 
   def handle_heal_to_full!
     puts "Healing to full."
+    performing_retreat = false
     @warrior.rest!
   end
 
